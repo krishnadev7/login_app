@@ -1,5 +1,6 @@
 import toast from 'react-hot-toast';
 
+// validate username
 export const usernameValidate = async values => {
   const errors = usernameVerify({}, values);
   return errors;
@@ -20,6 +21,15 @@ export async function resetPasswordValidation(values){
     }
 
     return errors;
+}
+
+// validate register 
+export async function validateRegister(values){
+  const errors = usernameVerify({}, values)
+  passwordVerify({},values)
+  emailVerify({}, values)
+
+  return errors;
 }
 
 
@@ -44,6 +54,19 @@ const passwordVerify = (error = {}, values) => {
     error.password = toast.error('password must be greater than 4 characters');
   } else if (!specialChar.test(values.password)) {
     error.password = toast.error('password must have one special character');
+  }
+  return error;
+};
+
+// validate emial
+const emailVerify = (error = {}, values) => {
+  const specialChar = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  if (!values.email) {
+    error.password = toast.error('email required');
+  } else if (values.email.includes(' ')) {
+    error.password = toast.error('wrong email..!');
+  }else if (!specialChar.test(values.email)) {
+    error.password = toast.error('Invalid email..!');
   }
   return error;
 };
