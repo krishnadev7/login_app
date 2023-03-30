@@ -3,7 +3,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const dotenv = require('dotenv');
 
-const mongoConnection = require('./connection');
+const mongoConnection = require('./database/connection');
 const router = require('./routes/route');
 
 const app = express();
