@@ -76,21 +76,32 @@ const login = async (req, res) => {
       expiresIn: '24h',
     });
 
-    return res
-      .status(200)
-      .json({
-        msg: 'Login successfull..!',
-        username: users.username,
-        access_token,
-      });
+    return res.status(200).json({
+      msg: 'Login successfull..!',
+      username: users.username,
+      access_token,
+    });
   } catch (error) {
     return res.status(500).send({ msg: error });
   }
 };
 
 /* GET http://localhost:3001/api/user/:username */
-const getUser = (req, res) => {
-  res.json('username route');
+const getUser = async (req, res) => {
+  const { username } = req.params;
+  try {
+    if (!username) {
+      return res.status(501).send({ error: 'Invalid username..!' });
+    }
+    const user = await userModel.findOne({ username });
+    if (!user) {
+      res.status(400).send({ error: "can't find user" });
+    }
+    const { password, ...users } = user._doc;
+    res.status(201).json(users);
+  } catch (error) {
+    res.status(500).send({ error: 'cannot find user data' });
+  }
 };
 /* GET http://localhost:3001/api/generateOTP */
 const generateOTP = (req, res) => {
