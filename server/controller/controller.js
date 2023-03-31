@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const userModel = require('../database/models/userModel');
 var jwt = require('jsonwebtoken');
+const { query } = require('express');
 
 /* Middleware for verifying user */
 const verifyUser = async (req, res, next) => {
@@ -117,9 +118,22 @@ const createResetSession = (req, res) => {
 };
 
 /* PUT http://localhost:3001/api/updateuser */
-const updateUser = (req, res) => {
-  res.json('updateUser route');
+const updateUser = async (req, res) => {
+  try {
+    const  id  = req.query.id;
+    if (id) {
+      const body = req.body;
+      const user = await userModel.findById({_id: id});
+      await user.updateOne({ $set: body });
+      res.status(201).send({ msg: 'Record updated..!' });
+    } else {
+      res.status(401).send({ error: 'user not found..!' });
+    }
+  } catch (error) {
+    res.status(401).send(error);
+  }
 };
+
 /* PUT http://localhost:3001/api/resetPassword */
 const resetPassword = (req, res) => {
   res.json('resetPassword route');
