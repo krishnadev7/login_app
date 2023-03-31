@@ -1,5 +1,6 @@
 const express = require('express');
 const { register, login, getUser, generateOTP, verifyOTP, createResetSession, updateUser, resetPassword, verifyUser } = require('../controller/controller');
+const auth = require('../middleware/auth');
 const router = express.Router();
 
 // post methods
@@ -15,7 +16,7 @@ router.get('/verifyOTP',verifyOTP)
 router.get('/createResetSession',createResetSession)
 
 // Put methods
-router.put('/updateuser',updateUser)
+router.put('/updateuser',auth,updateUser)
 router.put('/resetPassword',resetPassword)
 
 module.exports = router;

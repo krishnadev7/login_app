@@ -120,10 +120,10 @@ const createResetSession = (req, res) => {
 /* PUT http://localhost:3001/api/updateuser */
 const updateUser = async (req, res) => {
   try {
-    const  id  = req.query.id;
-    if (id) {
+    const { users } = req.user;
+    if (users._id) {
       const body = req.body;
-      const user = await userModel.findById({_id: id});
+      const user = await userModel.findById({ _id: users._id });
       await user.updateOne({ $set: body });
       res.status(201).send({ msg: 'Record updated..!' });
     } else {
