@@ -1,12 +1,12 @@
 const express = require('express');
-const { register, login, getUser, generateOTP, verifyOTP, createResetSession, updateUser, resetPassword } = require('../controller/controller');
+const { register, login, getUser, generateOTP, verifyOTP, createResetSession, updateUser, resetPassword, verifyUser } = require('../controller/controller');
 const router = express.Router();
 
 // post methods
 router.post('/register', register)
 // router.post('/registerMail')
 router.post('/authenticate',(req,res) => res.end())
-router.post('/login',login)
+router.post('/login',verifyUser,login)
 
 // Get methods
 router.get('/user/:username',getUser)

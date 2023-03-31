@@ -1,5 +1,20 @@
 const bcrypt = require('bcrypt');
 const userModel = require('../database/models/userModel');
+var jwt = require('jsonwebtoken');
+
+/* Middleware for verifying user */
+const verifyUser = async (req, res, next) => {
+  try {
+    const { username } = req.method == 'GET' ? req.query : req.body;
+    const user = await userModel.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ msg: "cant't find user" });
+    }
+    next();
+  } catch (error) {
+    res.status(404).send({ error: 'Autentication Error' });
+  }
+};
 
 /* POST http://localhost:3001/api/register */
 const register = async (req, res) => {
@@ -23,7 +38,8 @@ const register = async (req, res) => {
     if (password) {
       hashedPass = await bcrypt.hash(password, 10);
     }
-    console.log(hashedPass);
+
+    // saving new user
     const newUser = new userModel({
       username,
       email,
@@ -41,8 +57,35 @@ const register = async (req, res) => {
 };
 
 /* POST http://localhost:3001/api/login */
-const login = (req, res) => {
-  res.json('login route');
+const login = async (req, res) => {
+  try {
+    const user = await userModel.findOne({ username: req.body.username });
+    if (!user) {
+      return res.status(404).send({ error: 'Username not found..!' });
+    }
+    const passCheck = await bcrypt.compare(req.body.password, user.password);
+    if (!passCheck) {
+      return res.status(400).send({ error: 'Invalid Password..!' });
+    }
+
+    // destructring user except password
+    const { password, ...users } = user._doc;
+
+    // creating jwt token
+    const access_token = jwt.sign({ users }, process.env.JWT_SEC, {
+      expiresIn: '24h',
+    });
+
+    return res
+      .status(200)
+      .json({
+        msg: 'Login successfull..!',
+        username: users.username,
+        access_token,
+      });
+  } catch (error) {
+    return res.status(500).send({ msg: error });
+  }
 };
 
 /* GET http://localhost:3001/api/user/:username */
@@ -72,6 +115,7 @@ const resetPassword = (req, res) => {
 };
 
 module.exports = {
+  verifyUser,
   register,
   login,
   getUser,
