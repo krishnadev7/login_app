@@ -17,6 +17,6 @@ router.get('/createResetSession',createResetSession)
 
 // Put methods
 router.put('/updateuser',auth,updateUser)
-router.put('/resetPassword',resetPassword)
+router.put('/resetPassword',verifyUser,resetPassword)
 
 module.exports = router;

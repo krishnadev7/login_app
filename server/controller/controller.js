@@ -150,8 +150,26 @@ const updateUser = async (req, res) => {
 };
 
 /* PUT http://localhost:3001/api/resetPassword */
-const resetPassword = (req, res) => {
-  res.json('resetPassword route');
+const resetPassword = async(req, res) => {
+  try {
+    if(!req.app.locals.resetSession) return res.status(440).send({error: "session expired..!"})
+    const {username,password} = req.body;
+    try {
+      const user = await userModel.findOne({username});
+      if(user){
+        let hashedPass = await bcrypt.hash(password,10);
+        user.updateOne({username: user.username},{password: hashedPass});
+        req.app.locals.resetSession = false;
+        return res.status(201).send({msg: "record updated..!",user})
+      }else{
+        return res.status(404).send({error: "username not found..!"})
+      }
+    } catch (error) {
+      return res.status(500).send({error})
+    }
+  } catch (error) {
+    return res.status(401).send({error})
+  }
 };
 
 module.exports = {
