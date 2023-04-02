@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const userModel = require('../database/models/userModel');
 var jwt = require('jsonwebtoken');
-const { query } = require('express');
+const otpGenerator = require('otp-generator');
 
 /* Middleware for verifying user */
 const verifyUser = async (req, res, next) => {
@@ -105,16 +105,31 @@ const getUser = async (req, res) => {
   }
 };
 /* GET http://localhost:3001/api/generateOTP */
-const generateOTP = (req, res) => {
-  res.json('generateOTP route');
+const generateOTP = async (req, res) => {
+  req.app.locals.OTP = await otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    lowerCaseAlphabets: false,
+    specialChars: false,
+  });
+  return res.status(200).send({ code: req.app.locals.OTP });
 };
 /* GET http://localhost:3001/api/verifyOTP */
-const verifyOTP = (req, res) => {
-  res.json('verifyOTP route');
+const verifyOTP = async (req, res) => {
+  const { code } = req.query;
+  if (parseInt(req.app.locals.OTP) === parseInt(code)) {
+    req.app.locals.OTP = null; // reset the OTP value
+    req.app.locals.resetSession = true; // start session for reset password
+    return res.status(201).send({ msg: 'Verified Successsfully!' });
+  }
+  return res.status(400).send({ error: 'Invalid OTP' });
 };
 /* GET http://localhost:3001/api/createResetSession */
 const createResetSession = (req, res) => {
-  res.json('createResetSession route');
+  if (req.app.locals.resetSession) {
+    req.app.locals.resetSession = false;
+    res.status(201).send({ msg: 'access granted' });
+  }
+  return res.status(440).send({ error: 'session expired..!' });
 };
 
 /* PUT http://localhost:3001/api/updateuser */
