@@ -19,9 +19,9 @@ const verifyUser = async (req, res, next) => {
 
 /* POST http://localhost:3001/api/register */
 const register = async (req, res) => {
+  let hashedPass;
   try {
     const { username, email, password, profile } = req.body;
-    let hashedPass;
     console.log(username, email, password, profile);
     // check for existing user
     const userExist = await userModel.findOne({ username });
@@ -150,25 +150,27 @@ const updateUser = async (req, res) => {
 };
 
 /* PUT http://localhost:3001/api/resetPassword */
-const resetPassword = async(req, res) => {
+const resetPassword = async (req, res) => {
   try {
-    if(!req.app.locals.resetSession) return res.status(440).send({error: "session expired..!"})
-    const {username,password} = req.body;
+    if (!req.app.locals.resetSession) {
+      return res.status(440).send({ error: 'session expired..!' });
+    }
+    const { username, password } = req.body;
     try {
-      const user = await userModel.findOne({username});
-      if(user){
-        let hashedPass = await bcrypt.hash(password,10);
-        user.updateOne({username: user.username},{password: hashedPass});
+      const user = await userModel.findOne({ username });
+      if (user) {
+        let hashedPass = await bcrypt.hash(password, 10);
+        user.updateOne({ username: user.username }, { password: hashedPass });
         req.app.locals.resetSession = false;
-        return res.status(201).send({msg: "record updated..!",user})
-      }else{
-        return res.status(404).send({error: "username not found..!"})
+        return res.status(201).send({ msg: 'record updated..!', user });
+      } else {
+        return res.status(404).send({ error: 'username not found..!' });
       }
     } catch (error) {
-      return res.status(500).send({error})
+      return res.status(500).send({ error });
     }
   } catch (error) {
-    return res.status(401).send({error})
+    return res.status(401).send({ error });
   }
 };
 
