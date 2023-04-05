@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../styles/Username.module.css'
 import avatar from '../assets/user.png'
 import {useFormik} from 'formik'
 import { usernameValidate } from '../helper/validate';
 import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from '../store/store';
 
 const Username = () => {
+  const setUsername = useAuthStore(state => state.setUsername);
+
+
   const formik = useFormik({
     initialValues: {
       username: ''
@@ -16,6 +20,7 @@ const Username = () => {
     validateOnChange: false,
     onSubmit: async values => {
       console.log(values);
+      setUsername(values)
     }
   })
   return (
