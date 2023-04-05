@@ -22,7 +22,7 @@ const register = async (req, res) => {
   let hashedPass;
   try {
     const { username, email, password, profile } = req.body;
-    console.log(username, email, password, profile);
+    // console.log(username, email, password, profile);
     // check for existing user
     const userExist = await userModel.findOne({ username });
     if (userExist) {
@@ -48,7 +48,7 @@ const register = async (req, res) => {
       profile: profile || '',
     });
     const user = await newUser.save();
-    res.json(200, {
+    res.json(201, {
       user,
       msg: 'success',
     });
@@ -111,7 +111,7 @@ const generateOTP = async (req, res) => {
     lowerCaseAlphabets: false,
     specialChars: false,
   });
-  return res.status(200).send({ code: req.app.locals.OTP });
+  return res.status(201).send({ code: req.app.locals.OTP });
 };
 /* GET http://localhost:3001/api/verifyOTP */
 const verifyOTP = async (req, res) => {

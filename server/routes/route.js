@@ -7,7 +7,7 @@ const router = express.Router();
 // post methods
 router.post('/register', register)
 router.post('/registerMail',registerMail)
-router.post('/authenticate',(req,res) => res.end())
+router.post('/authenticate',verifyUser,(req,res) => res.end())
 router.post('/login',verifyUser,login)
 
 // Get methods
