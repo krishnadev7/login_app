@@ -4,10 +4,10 @@ import { authenticate } from './helper';
 // validate username
 export const usernameValidate = async values => {
   const errors = usernameVerify({}, values);
-  if(values.username){
-    const {status} = await authenticate(values.username);
-    if(status !== 200){
-      errors.exist = toast.error("User does't exists...!")
+  if (values.username) {
+    const { status } = await authenticate(values.username);
+    if (status !== 200) {
+      errors.exist = toast.error("User does't exists...!");
     }
   }
   return errors;
@@ -20,31 +20,30 @@ export const passwordValidate = async values => {
 };
 
 /** validate reset password */
-export async function resetPasswordValidation(values){
-    const errors = passwordVerify({}, values);
+export async function resetPasswordValidation(values) {
+  const errors = passwordVerify({}, values);
 
-    if(values.password !== values.confirm_pwd){
-        errors.exist = toast.error("Password not match...!");
-    }
+  if (values.password !== values.confirm_pwd) {
+    errors.exist = toast.error('Password not match...!');
+  }
 
-    return errors;
+  return errors;
 }
 
-// validate register 
-export async function validateRegister(values){
-  const errors = usernameVerify({}, values)
-  passwordVerify({},values)
-  emailVerify({}, values)
+// validate register
+export async function validateRegister(values) {
+  const errors = usernameVerify({}, values);
+  passwordVerify({}, values);
+  emailVerify({}, values);
 
   return errors;
 }
 
 // validate Profile
-export async function validateProfile(values){
-  const errors = emailVerify({}, values)
+export async function validateProfile(values) {
+  const errors = emailVerify({}, values);
   return errors;
 }
-
 
 /* validate username */
 const usernameVerify = (error = {}, values) => {
@@ -78,7 +77,7 @@ const emailVerify = (error = {}, values) => {
     error.password = toast.error('email required');
   } else if (values.email.includes(' ')) {
     error.password = toast.error('wrong email..!');
-  }else if (!specialChar.test(values.email)) {
+  } else if (!specialChar.test(values.email)) {
     error.password = toast.error('Invalid email..!');
   }
   return error;

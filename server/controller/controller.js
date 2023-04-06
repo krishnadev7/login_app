@@ -22,7 +22,6 @@ const register = async (req, res) => {
   let hashedPass;
   try {
     const { username, email, password, profile } = req.body;
-    // console.log(username, email, password, profile);
     // check for existing user
     const userExist = await userModel.findOne({ username });
     if (userExist) {
