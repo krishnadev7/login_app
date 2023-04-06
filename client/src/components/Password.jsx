@@ -5,8 +5,12 @@ import avatar from '../assets/user.png';
 import { useFormik } from 'formik';
 import { passwordValidate } from '../helper/validate';
 import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from '../store/store';
+import useFetch from '../hook/fetch.hook';
 
 const Password = () => {
+  const {username:{username}} = useAuthStore(state => state.auth);
+  const [{isLoading,apiData,serverError}] = useFetch(`user/${username}`);
   const formik = useFormik({
     initialValues: {
       password: '',
@@ -18,20 +22,24 @@ const Password = () => {
       console.log(values);
     },
   });
+
+  if(isLoading) return <h1 className='text-2xl font-bold'>loading...</h1>
+  if(serverError) return <h1 className='text-xl text-red-500'>{serverError.message}</h1>
+  
   return (
     <div className='container mx-auto'>
       <Toaster position='top-center' reverseOrder={false} />
       <div className='flex justify-center items-center h-screen'>
         <div className={styles.glass}>
           <div className='title flex flex-col items-center'>
-            <h4 className='text-5xl font-bold'>Hello Again!</h4>
+            <h4 className='text-5xl font-bold'>Hello {apiData?.firstname || apiData?.username}!</h4>
             <span className='py-4 text-xl w-2/3 text-center text-gray-600'>
               Explore More by connecting with us.
             </span>
           </div>
           <form className='py-1' onSubmit={formik.handleSubmit}>
             <div className='py-4 profile flex justify-center'>
-              <img src={avatar} alt='avatar' className={styles.profile_img} />
+              <img src={apiData?.profile || avatar} alt='avatar' className={styles.profile_img} />
             </div>
 
             <div className='textbox flex flex-col items-center gap-6'>
