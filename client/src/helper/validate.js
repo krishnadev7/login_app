@@ -32,9 +32,10 @@ export async function resetPasswordValidation(values) {
 
 // validate register
 export async function validateRegister(values) {
-  const errors = usernameVerify({}, values);
-  passwordVerify({}, values);
-  emailVerify({}, values);
+  const errors = passwordVerify({}, values)
+  usernameVerify({}, values)
+
+  emailVerify({}, values)
 
   return errors;
 }
