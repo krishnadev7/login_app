@@ -139,6 +139,7 @@ const updateUser = async (req, res) => {
       const body = req.body;
       const user = await userModel.findById({ _id: users._id });
       await user.updateOne({ $set: body });
+      console.log(user);
       res.status(201).send({ msg: 'Record updated..!' });
     } else {
       res.status(401).send({ error: 'user not found..!' });

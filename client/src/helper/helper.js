@@ -1,4 +1,5 @@
 import axios from 'axios';
+import jwt_decode from 'jwt-decode'
 axios.defaults.baseURL = import.meta.env.VITE_APP_SERVER_URL;
 
 /** authenticate function */
@@ -9,6 +10,14 @@ export async function authenticate(username) {
     console.log(error);
     return { error: "username doesn't exists..!" };
   }
+}
+
+/** to get username from token */
+export async function getUsername(){
+  const token =  localStorage.getItem('token')
+  if(!token) return Promise.reject("Cannot find token..")
+  let decode = jwt_decode(token);
+  console.log(decode);
 }
 
 /** Get user details */
@@ -53,7 +62,7 @@ export async function LoginUser({ username, password }) {
   try {
     if (username) {
       const { data } = await axios.post('/api/login', { username, password });
-      console.log('Login data', data);
+      // console.log('Login data', data);
       return { data };
     }
   } catch (error) {

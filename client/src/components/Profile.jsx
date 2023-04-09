@@ -4,33 +4,56 @@ import styles from '../styles/Username.module.css';
 import extend from '../styles/profile.module.css';
 import avatar from '../assets/user.png';
 import { useFormik } from 'formik';
-import { passwordValidate, validateProfile, validateRegister } from '../helper/validate';
-import { Toaster } from 'react-hot-toast';
+import {
+  passwordValidate,
+  validateProfile,
+  validateRegister,
+} from '../helper/validate';
+import { Toaster, toast } from 'react-hot-toast';
 import convertToBase64 from '../helper/convert';
+import { useAuthStore } from '../store/store';
+import useFetch from '../hook/fetch.hook';
+import { UpdateUser } from '../helper/helper';
 
 const Profile = () => {
   const [file, setFile] = useState();
+  const {
+    username: { username },
+  } = useAuthStore(state => state.auth);
+  const [{ isLoading, apiData, serverError }] = useFetch(`user/${username}`);
+  // console.log(apiData);
   const formik = useFormik({
     initialValues: {
-      firstname: '',
-      lastname: '',
-      email: '',
-      mobile: '',
-      address: '',
+      firstName: apiData?.firstName || '',
+      lastName: apiData?.lastName || '',
+      email: apiData?.email || '',
+      mobile: apiData?.mobile || '',
+      address: apiData?.address || '',
     },
+    enableReinitialize: true,
     validate: validateProfile,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values => {
-      values = await Object.assign(values, { profile: file || '' });
-      console.log(values);
+      values = await Object.assign(values, { profile: file || apiData?.profile || '' });
+      let updateUserPromise = UpdateUser(values);
+      toast.promise(updateUserPromise,{
+        loading: "updating...",
+        success: <b>Update Successfully!</b>,
+        error: <b>Could not update!</b>
+      })
     },
+    
   });
 
   const onUpload = async e => {
     const base64 = await convertToBase64(e.target.files[0]);
     setFile(base64);
   };
+
+  if (isLoading) return <h1 className='text-2xl font-bold'>loading...</h1>;
+  if (serverError)
+    return <h1 className='text-xl text-red-500'>{serverError.message}</h1>;
 
   return (
     <div className='container mx-auto'>
@@ -50,7 +73,7 @@ const Profile = () => {
             <div className='py-4 profile flex justify-center'>
               <label htmlFor='profile'>
                 <img
-                  src={file || avatar}
+                  src={apiData?.profile || file || avatar}
                   alt='avatar'
                   className={`${styles.profile_img} ${extend.profile_img}`}
                 />
@@ -69,13 +92,13 @@ const Profile = () => {
                   type='text'
                   placeholder='firstname'
                   className={`${styles.textbox} ${extend.textbox}`}
-                  {...formik.getFieldProps('firstname')}
+                  {...formik.getFieldProps('firstName')}
                 />
                 <input
                   type='text'
                   placeholder='lastname'
                   className={`${styles.textbox} ${extend.textbox}`}
-                  {...formik.getFieldProps('lastname')}
+                  {...formik.getFieldProps('lastName')}
                 />
               </div>
               <div className='name flex w-3/4 gap-10'>

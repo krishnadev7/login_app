@@ -23,7 +23,7 @@ const Password = () => {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async values => {
-      console.log(values);
+      // console.log(values);
       let loginPromise = LoginUser({ username, password: values.password });
       toast.promise(loginPromise, {
         loading: 'Checking...',
@@ -31,8 +31,8 @@ const Password = () => {
         error: <b>Password not match!</b>,
       });
       loginPromise.then(res => {
-        let {token} = res.data;
-        localStorage.setItem("token",token);
+        let { access_token } = res.data;
+        localStorage.setItem('token', access_token);
         navigate('/profile')
       })
     },
