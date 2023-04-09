@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from '../styles/Username.module.css';
 import extend from '../styles/profile.module.css';
 import avatar from '../assets/user.png';
@@ -16,6 +16,7 @@ import useFetch from '../hook/fetch.hook';
 import { UpdateUser } from '../helper/helper';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [file, setFile] = useState();
   const {
     username: { username },
@@ -54,6 +55,11 @@ const Profile = () => {
   if (isLoading) return <h1 className='text-2xl font-bold'>loading...</h1>;
   if (serverError)
     return <h1 className='text-xl text-red-500'>{serverError.message}</h1>;
+
+    const userLogout = () => {
+      localStorage.removeItem('token');
+      navigate('/');
+    }
 
   return (
     <div className='container mx-auto'>
@@ -131,9 +137,9 @@ const Profile = () => {
             <div className='text-center py-4'>
               <span className='text-gray-500'>
                 Come back later ?
-                <Link to='/' className='text-red-600 p-1'>
+                <button onClick={userLogout} className='text-red-600 p-1'>
                   Logout
-                </Link>
+                </button>
               </span>
             </div>
           </form>
