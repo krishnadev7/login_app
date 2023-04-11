@@ -81,7 +81,7 @@ const Password = () => {
             <div className='text-center py-4'>
               <span className='text-gray-500'>
                 Forgot your password ?
-                <Link to='/reset' className='text-red-600 p-1'>
+                <Link to='/recovery' className='text-red-600 p-1'>
                   Recover Now
                 </Link>
               </span>

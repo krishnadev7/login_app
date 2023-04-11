@@ -1,12 +1,51 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from '../styles/Username.module.css';
 import avatar from '../assets/user.png';
 import { useFormik } from 'formik';
 import { passwordValidate, usernameValidate } from '../helper/validate';
-import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from '../store/store';
+import { Toaster, toast } from 'react-hot-toast';
+import { generateOTP, verifyOTP } from '../helper/helper';
 
 const Recovery = () => {
+  const navigate = useNavigate();
+  const {
+    username: { username },
+  } = useAuthStore(state => state.auth);
+  const [otp, setOtp] = useState();
+  useState(() => {
+    generateOTP(username).then(otp => {
+      console.log(otp);
+      if (otp) return toast.success('OTP has send to your email!');
+      return toast.error('Problem while generating otp!');
+    });
+  }, [username]);
+
+  const onSubmit = async e => {
+    e.preventDefault();
+      let { status } = await verifyOTP({ username, code: otp });
+      if (status == 201) {
+       toast.success('verify successfully..!');
+        return navigate('/reset');
+      }else{
+        return toast.error("wrong otp check your email again!!")
+      }
+
+  };
+
+  const resendOtp = e => {
+    e.preventDefault();
+    let resendPromise = generateOTP(username);
+    toast.promise(resendPromise, {
+      loading: 'sending..',
+      success: <b>otp has been send to your email</b>,
+      error: <b>Cant send otp</b>,
+    });
+    resendPromise.then(otp => {
+      console.log(otp);
+    });
+  };
 
   return (
     <div className='container mx-auto'>
@@ -19,15 +58,18 @@ const Recovery = () => {
               Enter OTP to recover password
             </span>
           </div>
-          <form className='py-1' >
+          <form className='py-1' onSubmit={onSubmit}>
             <div className='py-4 profile flex justify-center'>
-                <span className='text-sm text-gray-600 py-4'>Enter 6 digit otp sent to your email address</span>
+              <span className='text-sm text-gray-600 py-4'>
+                Enter 6 digit otp sent to your email address
+              </span>
             </div>
 
             <div className='textbox flex flex-col items-center gap-6'>
               <input
                 type='number'
                 placeholder='O T P'
+                onChange={e => setOtp(e.target.value)}
                 className={styles.textbox}
               />
               <button
@@ -37,15 +79,13 @@ const Recovery = () => {
                 Recover
               </button>
             </div>
+          </form>
             <div className='text-center py-4'>
               <span className='text-gray-500'>
                 Can't get OTP ?
-                <button className='text-red-600 p-1'>
-                  Resend Otp
-                </button>
+                <button className='text-red-600 p-1' onClick={resendOtp}>Resend Otp</button>
               </span>
             </div>
-          </form>
         </div>
       </div>
     </div>
