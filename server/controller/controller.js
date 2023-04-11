@@ -156,13 +156,20 @@ const resetPassword = async (req, res) => {
       return res.status(440).send({ error: 'session expired..!' });
     }
     const { username, password } = req.body;
+    console.log(username,password);
     try {
       const user = await userModel.findOne({ username });
       if (user) {
-        let hashedPass = await bcrypt.hash(password, 10);
-        user.updateOne({ username: user.username }, { password: hashedPass });
-        req.app.locals.resetSession = false;
-        return res.status(201).send({ msg: 'record updated..!', user });
+        try {
+          let hashedPass = await bcrypt.hash(password, 10);
+          console.log(hashedPass);
+          user.updateOne({ username: user.username }, { password: hashedPass });
+          req.app.locals.resetSession = false;
+          console.log(user);
+          return res.status(201).send({ msg: 'record updated..!', user });
+        } catch (error) {
+          return res.status(500).send({msg:"unable to update",error})
+        }
       } else {
         return res.status(404).send({ error: 'username not found..!' });
       }
